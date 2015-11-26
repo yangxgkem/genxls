@@ -29,22 +29,23 @@ class class_gen {
 				$sheetdata = $sheet->toArray();
 
 				//兼容合并单元格 注意此接口, 如果你设置了 $reader->setReadDataOnly(true), 那么此接口将返回空值
+				//数据样式： Array( ["D5:D6"] => "D5:D6", )
 				$mergeCells = $sheet->getMergeCells();
 				foreach ($mergeCells as $key => $value) {
 					$var = explode(":", $value);
 
-					list($fc, $fr) = PHPExcel_Cell::coordinateFromString($var[0]);
-					$fc = PHPExcel_Cell::columnIndexFromString($fc) - 1;
+					list($fc, $fr) = PHPExcel_Cell::coordinateFromString($var[0]);//把单元格名分为 列, 行 (eg: D,5)
+					$fc = PHPExcel_Cell::columnIndexFromString($fc) - 1;//把字母列转换为数值 (eg: D转换后为4)
 
 					list($lc, $lr) = PHPExcel_Cell::coordinateFromString($var[1]);
 					$lc = PHPExcel_Cell::columnIndexFromString($lc) - 1;
 
-					$tmpvalue = $sheetdata[($fr-1)][$fc];
+					$tmpvalue = $sheetdata[($fr-1)][$fc];//最左上角值
 					$r = $fr - 1;
 					while($r++ < $lr) {
 						$c = $fc - 1;
 						while($c++ < $lc) {
-							$sheetdata[$r-1][$c] = $tmpvalue;
+							$sheetdata[$r-1][$c] = $tmpvalue;//将合并的单元格全部设置为最左上角值
 						}
 					}
 				}
