@@ -2,8 +2,7 @@
 <?php
 
 //道具数据
-function GetItemData() {
-	return array (
+$setting_data["ItemData"] = array (
   1001 => 
   array (
     'ItemId' => 1001,
@@ -18,4 +17,3 @@ function GetItemData() {
     'Desc2' => '此道具只能在战斗中使用',
   ),
 );
-}

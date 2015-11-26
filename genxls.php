@@ -2,10 +2,12 @@
 
 require_once "gen/base/xls.php";
 
-//指令数据
+
+//道具数据
 function gen_item($xlsObj) {
 	require_once "gen/item/gen_item.php";
-	DoGen($xlsObj);
+	$gen = new class_gen_item($xlsObj);
+	$gen->DoGen();
 }
 
 //gen all
@@ -22,8 +24,8 @@ function gen_all($xlsObj) {
 
 //指令集合
 $Actions = array(
-	"item" => "gen_item",//道具数据
 	"genall" => "gen_all",//所有导表
+	"item" => "gen_item",//指令数据
 );
 
 
