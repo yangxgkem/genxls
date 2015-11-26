@@ -1,22 +1,19 @@
 <?php
 
-require_once "gen/base/xls.php";
-
-
 //道具数据
-function gen_item($xlsObj) {
+function gen_item() {
 	require_once "gen/item/gen_item.php";
-	$gen = new class_gen_item($xlsObj);
+	$gen = new class_gen_item();
 	$gen->DoGen();
 }
 
 //gen all
-function gen_all($xlsObj) {
+function gen_all() {
 	$actions = $GLOBALS['Actions'];
 	$ignore = array("genall");
 	foreach ($actions as $key => $value) {
 		if (! in_array($key, $ignore)) {
-			$value($xlsObj);
+			$value();
 		}
 	}
 }
@@ -35,10 +32,9 @@ function gen($argv) {
 		return;
 	}
 	$actions = $GLOBALS['Actions'];
-	$xlsObj = new xls();
 	for ($i=1; $i<count($argv); $i++) {
 		$act = $actions[($argv[$i])];
-		$act($xlsObj);
+		$act();
 	}
 	echo "\ngen success!!!\n\n";
 }

@@ -1,9 +1,13 @@
 <?php
 
 require_once 'gen/3rd/phpexcel/PHPExcel.php';
-require_once 'gen/base/template.php';
 
-class xls {
+class class_gen {
+
+	public $var_name = 1; //变量名所在行
+	public $var_type = 2; //变量类型所在行
+	public $var_null = 3; //是否为空行
+	public $data_start_row = 4; //数据行
 
 	//读取xls数据
 	public function read_data($filename, $sheetname=NULL) {
@@ -14,18 +18,42 @@ class xls {
 			$readertype = 'Excel2007';
 		}
 		$reader = PHPExcel_IOFactory::createReader($readertype);
-		$reader->setReadDataOnly(true);//设置为只读模式
+		//$reader->setReadDataOnly(true);//设置为只读模式
 		$excel = $reader->load($filename);
 		$allsheet = $excel->getSheetNames();
+
 		$data = array();
 		foreach ($allsheet as $key => $name) {
 			if ( ! $sheetname OR $name==$sheetname) {
 				$sheet = $excel->getSheetByName($name);
 				$sheetdata = $sheet->toArray();
+
+				//兼容合并单元格 注意此接口, 如果你设置了 $reader->setReadDataOnly(true), 那么此接口将返回空值
+				$mergeCells = $sheet->getMergeCells();
+				foreach ($mergeCells as $key => $value) {
+					$var = explode(":", $value);
+
+					list($fc, $fr) = PHPExcel_Cell::coordinateFromString($var[0]);
+					$fc = PHPExcel_Cell::columnIndexFromString($fc) - 1;
+
+					list($lc, $lr) = PHPExcel_Cell::coordinateFromString($var[1]);
+					$lc = PHPExcel_Cell::columnIndexFromString($lc) - 1;
+
+					$tmpvalue = $sheetdata[($fr-1)][$fc];
+					$r = $fr - 1;
+					while($r++ < $lr) {
+						$c = $fc - 1;
+						while($c++ < $lc) {
+							$sheetdata[$r-1][$c] = $tmpvalue;
+						}
+					}
+				}
+
 				if ($sheetname) return $sheetdata;
 				$data[$name] = $sheetdata;
 			}
 		}
+
 		return $data;
 	}
 
@@ -126,6 +154,24 @@ class xls {
 		return $newdata;
 	}
 
+	//解析数据
+	public function getdata($in_file, $sheetname=NULL) {
+		$data = $this->read_data($in_file, $sheetname);
+		$retdata = array();
+		if($sheetname === NULL) {
+			foreach ($data as $key => $value) {
+				if(count($value)>4) {
+					$tmp = $this->gen_data($in_file, $key, $value, $this->var_name, $this->var_type, $this->var_null, $this->data_start_row);
+					$retdata[$key] = $tmp;
+				}
+			}
+			return $retdata;
+		}
+		else {
+			return $this->gen_data($in_file, $sheetname, $data, $this->var_name, $this->var_type, $this->var_null, $this->data_start_row);
+		}
+	}
+
 	//存储文件 php数组
 	public function save($file, $name, $data, $desc) {
 		$lastdir = strripos($file, "/");
@@ -136,12 +182,13 @@ class xls {
 
 		$fp = fopen($file, "w");
 		$datastr = var_export($data, TRUE);
-		$str = sprintf($GLOBALS['func_template'], $desc, $name, $datastr);
+		require_once 'gen/base/template.php';
+		$str = sprintf($func_template, $desc, $name, $datastr);
 		fwrite($fp, $str);
 		fclose($fp);
 	}
 
-	//json
+	//存储文件 json
 	public function save_json($file, $name, $data) {
 		$lastdir = strripos($file, "/");
 		if($lastdir>0) {

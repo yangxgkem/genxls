@@ -8,6 +8,7 @@ $setting_data["ItemData"] = array (
     'ItemId' => 1001,
     'Name' => '气血包',
     'Desc1' => '恢复800点血量',
+    'Desc2' => '此道具只能在战斗中使用',
   ),
   1002 => 
   array (
