@@ -78,3 +78,9 @@ genxls.php					--指令执行文件
 编写导表程序.php规则：定制好gen类的各个必须属性参数，根据自定义解析格式编写gen::Dogen()接口。详细例子可以参考`gen/item/gen_item.php`。
 
 genxls地址：**[https://github.com/yangxgkem/genxls](https://github.com/yangxgkem/genxls)**
+
+------------------------------------------
+
+2015/11/26 星期四 15:43:51 
+
+解决合并单元格，只有最左上角有值，其他单元格为空的问题。
