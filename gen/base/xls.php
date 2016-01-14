@@ -136,7 +136,7 @@ class class_gen {
 								exit();
 							}
 							break;
-						
+
 						case 'string':
 							if(! is_string($dat[$key])) {
 								echo printf("\n数据类型ERROR: 文件:%s, 工作表:%s, string, 行号:%s, 列号:%s\n", $filename, $sheetname, $i+1, $key+1);
@@ -183,7 +183,7 @@ class class_gen {
 
 		$fp = fopen($file, "w");
 		$datastr = var_export($data, TRUE);
-		require_once 'gen/base/template.php';
+		require 'gen/base/template.php';
 		$str = sprintf($func_template, $desc, $name, $datastr);
 		fwrite($fp, $str);
 		fclose($fp);
