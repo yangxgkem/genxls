@@ -143,6 +143,17 @@ class class_gen {
 								exit();
 							}
 							break;
+
+						case 'numbers':
+							$exp = explode(",", $dat[$key]);
+							foreach ($exp as $expk => $expv) {
+								if(! is_numeric($expv)) {
+									echo printf("\n数据类型ERROR: 文件:%s, 工作表:%s, number, 行号:%s, 列号:%s\n", $filename, $sheetname, $i+1, $key+1);
+									exit();
+								}
+							}
+							$dat[$key] = $exp;
+							break;
 					}
 				}
 				//整理数据
