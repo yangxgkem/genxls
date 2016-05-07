@@ -11,9 +11,34 @@ function gen_item() {
 function gen_all() {
 	$actions = $GLOBALS['Actions'];
 	$ignore = array("genall");
+	$forklist = array("item");
+	$forknum = 0;
 	foreach ($actions as $key => $value) {
 		if (! in_array($key, $ignore)) {
-			$value();
+			if (in_array($key, $forklist)) {
+				$forknum = $forknum + 1;
+				//创建子进程处理
+				echo "fork $value create\n";
+				$npid = pcntl_fork();
+				if ($npid == 0) {
+					$value();
+					//执行完后退出
+					echo "fork $value exit\n";
+					exit(0);
+				}
+			} else {
+				$value();
+			}
+		}
+	}
+
+	//等待子进程执行完毕，避免僵尸进程
+	$n = 0;
+	while ($n < $forknum) {
+		$status = -1;
+		$npid = pcntl_wait($status, WNOHANG);
+		if ($npid > 0) {
+			++$n;
 		}
 	}
 }
@@ -21,8 +46,8 @@ function gen_all() {
 
 //指令集合
 $Actions = array(
-	"genall" => "gen_all",//所有导表
-	"item" => "gen_item",//指令数据
+	"genall" => "gen_all", //所有导表
+	"item" => "gen_item", //指令数据
 );
 
 
